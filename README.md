@@ -1,97 +1,121 @@
-#include "shell.h"
+# 0x15. C - Simple Shell
 
-/**
- * _myexit - exits the shell
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype
- *  Return: exits with a given exit status
- *         (0) if info.argv[0] != "exit"
- */
-int _myexit(info_t *info)
-{
-	int exitcheck;
+## Description
 
-	if (info->argv[1])  /* If there is an exit arguement */
-	{
-		exitcheck = _erratoi(info->argv[1]);
-		if (exitcheck == -1)
-		{
-			info->status = 2;
-			print_error(info, "Illegal number: ");
-			_eputs(info->argv[1]);
-			_eputchar('\n');
-			return (1);
-		}
-		info->err_num = _erratoi(info->argv[1]);
-		return (-2);
-	}
-	info->err_num = -1;
-	return (-2);
-}
+In this project we are tasked with creating our own simple UNIX command interpreter. The program must have the exact same output as sh (/bin/sh) as well as the exact same error output. The only difference is when you print an error, the name of the program must be equivalent to your argv[0].
 
-/**
- * _mycd - changes the current directory of the process
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype.
- *  Return: Always 0
- */
-int _mycd(info_t *info)
-{
-	char *s, *dir, buffer[1024];
-	int chdir_ret;
+---
 
-	s = getcwd(buffer, 1024);
-	if (!s)
-		_puts("TODO: >>getcwd failure emsg here<<\n");
-	if (!info->argv[1])
-	{
-		dir = _getenv(info, "HOME=");
-		if (!dir)
-			chdir_ret = /* TODO: what should this be? */
-				chdir((dir = _getenv(info, "PWD=")) ? dir : "/");
-		else
-			chdir_ret = chdir(dir);
-	}
-	else if (_strcmp(info->argv[1], "-") == 0)
-	{
-		if (!_getenv(info, "OLDPWD="))
-		{
-			_puts(s);
-			_putchar('\n');
-			return (1);
-		}
-		_puts(_getenv(info, "OLDPWD=")), _putchar('\n');
-		chdir_ret = /* TODO: what should this be? */
-			chdir((dir = _getenv(info, "OLDPWD=")) ? dir : "/");
-	}
-	else
-		chdir_ret = chdir(info->argv[1]);
-	if (chdir_ret == -1)
-	{
-		print_error(info, "can't cd to ");
-		_eputs(info->argv[1]), _eputchar('\n');
-	}
-	else
-	{
-		_setenv(info, "OLDPWD", _getenv(info, "PWD="));
-		_setenv(info, "PWD", getcwd(buffer, 1024));
-	}
-	return (0);
-}
+## Instructions
 
-/**
- * _myhelp - changes the current directory of the process
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype.
- *  Return: Always 0
- */
-int _myhelp(info_t *info)
-{
-	char **arg_array;
+* Compiling the program:
+`gcc -Wall -Werror -Wextra -pedantic *.c -o hsh`
 
-	arg_array = info->argv;
-	_puts("help call works. Function not yet implemented \n");
-	if (0)
-		_puts(*arg_array); /* temp att_unused workaround */
-	return (0);
-}
+* Interactive mode:
+```
+$ ./hsh
+($) /bin/ls
+hsh main.c shell.c
+($)
+($) exit
+$
+```
+
+* Non-interactie mode:
+```
+$ echo "/bin/ls" | ./hsh
+hsh main.c shell.c test_ls_2
+$
+$ cat test_ls_2
+/bin/ls
+/bin/ls
+$
+$ cat test_ls_2 | ./hsh
+hsh main.c shell.c test_ls_2
+hsh main.c shell.c test_ls_2
+$
+```
+---
+
+## Example
+
+![example](https://media.giphy.com/media/cC9jj6fr8m5SZ56Z2l/giphy.gif)
+
+---
+
+## Files
+
+File|Description
+---|---
+[main.c](./main.c)|entry point for shell
+[shell.c](./shell.c)|executes the shell
+[shell.h](./shell.h)|header
+[builtins.c](./builtins.c)|built-in functions
+[helpers.c](./helpers.c)|helper functions
+[extraneous.c](./extraneous.c)|more helper functions
+[_getenv.c](./_getenv.c)|gets inputted env
+[search_cwd.c](./search_cwd.c)|gets current working dir
+[find_path.c](./find_path.c)|finds PATH
+[bridge.c](./bridge.c)|checks if builtin or not
+[execute.c](./execute.c)|executes builtin or binary
+[man_1_simple_shell](./man_1_simple_shell)|man page
+
+---
+
+## Project Requirements
+- All your files will be compiled on Ubuntu 14.04 LTS
+- Your C programs and functions will be compiled with gcc 4.8.4 using the flags `-Wall -Werror -Wextra and -pedantic`
+- All your files should end with a new line
+- A README.md file, at the root of the folder of the project is mandatory
+- Your code should use the Betty style. It will be checked using [betty-style.pl](https://github.com/holbertonschool/Betty/blob/master/betty-style.pl) and [betty-doc.pl](https://github.com/holbertonschool/Betty/blob/master/betty-doc.pl)
+- No more than 5 functions per file
+- All your header files should be include guarded
+- Use system calls only when you need to
+
+---
+
+## Tasks
+
+### 0. README, man, AUTHORS
+* Write a (README)[./README.md]
+* Write a (man)[./man_1_simple_shell] for your shell.
+* You should have an (AUTHORS)[./AUTHORS] file at the root of your repository, listing all individuals having contributed content to the repository.
+
+### 1. Betty would be proud
+* Write a beautiful code that passes the Betty checks
+
+### 2. Simple shell 0.1
+* Write a UNIX command line interpreter.
+* Your Shell should:
+	- Display a prompt and wait for the user to type a command. A command line always ends with a new line.
+	- The prompt is displayed again each time a command has been executed.
+	- The command lines are simple, no semicolons, no pipes, no redirections or any other advanced features.
+	- The command lines are made only of one word. No arguments will be passed to programs.
+	- If an executable cannot be found, print an error message and display the prompt again.
+	- Handle errors.
+	- You have to handle the "end of file" condition (Ctrl+D)
+
+### 3. Simple shell 0.2
+* Handle command lines with arguments
+
+### 4. Simple shell 0.3
+* Handle the PATH
+
+### 5. Simple shell 0.4
+* Implement the exit built-in, that exits the shell
+* Usage: exit
+* You dont have to handle any argument to the built-in exit
+
+### 6. Simple shell 1.0
+* Implement the env built-in, that prints the current environment
+
+### 7. What happens when you type ls -l in the shell
+* Blog:
+	- [Medium](https://medium.com/@antisyllogism/what-happens-when-you-type-ls-l-in-the-shell-21a089cf0eb4)
+
+---
+
+## Authors
+* **Derrick Gee** - [kai-dg](https://github.com/kai-dg)
+* **Andrew Lindburg** - [atlindburg](https://github.com/atlindburg)
+* **Russell Molimock** - [Rmolimock](https://github.com/Rmolimock)
