@@ -1,3 +1,4 @@
+
 #include "shell.h"
 
 /**
@@ -83,3 +84,4 @@ char *find_path(info_t *info, char *pathstr, char *cmd)
 		i++;
 	}
 	return (NULL);
+}
